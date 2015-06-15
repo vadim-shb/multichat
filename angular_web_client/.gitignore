@@ -1,0 +1,4 @@
+#Client deploy specific
+bower_components
+node_modules
+src/lib/*

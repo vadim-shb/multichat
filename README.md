@@ -13,7 +13,7 @@ Two types of messages:
 
 Clients on:
 - JavaEE (Wildfly) + JSF 
-- Spring + GWT
+- Spring + AngularJS + Bootstrap
  
 ---
 
