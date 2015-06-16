@@ -1,0 +1,28 @@
+<!doctype html>
+<html ng-app="webClient">
+<head>
+    <meta charset="utf-8">
+    <title>blanky</title>
+    <!-- inject:css -->
+    <link rel="stylesheet" href="lib/bootstrap.css">
+    <link rel="stylesheet" href="css/app.css">
+    <!-- endinject -->
+    <!-- inject:js -->
+    <script src="lib/jquery.js"></script>
+    <script src="lib/angular.js"></script>
+    <script src="lib/angular-route.js"></script>
+    <script src="lib/bootstrap.js"></script>
+    <script src="app.js"></script>
+    <script src="pages/chat-controller.js"></script>
+    <!-- endinject -->
+</head>
+<body>
+<noscript>
+    <div>
+        <h3>Javascript is deactivated. You must <a href="http://www.activatejavascript.org/">activate javascript</a>
+            in order to use this site.</h3>
+    </div>
+</noscript>
+<div ng-view=""></div>
+</body>
+</html>
