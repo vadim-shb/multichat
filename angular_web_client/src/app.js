@@ -8,4 +8,4 @@ angular
         $routeProvider.when('/', {templateUrl: 'pages/chat.html', controller: 'ChatCtrl'});
         $routeProvider.otherwise({redirectTo: '/'});
     }])
-    .value('serverUrl', 'http://localhost:12000/api');
+    .value('serverUrl', 'localhost:12000');
