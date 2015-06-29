@@ -20,13 +20,14 @@ var config = {
     bowerJsForTest: [
         'bower_components/angular-mocks/angular-mocks.js'
     ],
-    jsTestSource: [
-        'test/**/*.js'
+    bowerFontsSource: [
+        'bower_components/bootstrap/fonts/*'
     ]
 };
 
 var devConfig = {
     libFolder: 'src/lib',
+    fontsFolder: 'src/fonts',
 
     bowerJs: [
         'bower_components/jquery/dist/jquery.js',
@@ -74,6 +75,9 @@ gulp.task('dev.libs2sources', function() {
     var bowerSources = devConfig.bowerJs.concat(devConfig.bowerCss);
     return bower2lib(bowerSources, devConfig.libFolder);
 });
+gulp.task('dev.fonts2sources', function() {
+    return copy(config.bowerFontsSource, devConfig.fontsFolder);
+});
 
 gulp.task('dev.sources2index', function() {
     var sources = devConfig.libJs
@@ -107,5 +111,5 @@ gulp.task('dev.browserSync.start', function() {
     });
 });
 
-gulp.task('dev', gulp.series('dev.libs2sources', 'dev.sources2index', gulp.parallel('dev.browserSync.start', 'dev.watch')));
+gulp.task('dev', gulp.series('dev.libs2sources', 'dev.fonts2sources', 'dev.sources2index', gulp.parallel('dev.browserSync.start', 'dev.watch')));
 

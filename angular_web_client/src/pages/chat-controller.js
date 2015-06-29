@@ -2,6 +2,7 @@
 
 angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUrl', function($scope, $http, defaultServerUrl) {
     $scope.serverUrl = defaultServerUrl;
+    $scope.connected = false;
 
     $scope.message = {
         text: ''
@@ -15,5 +16,13 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUr
             .error(function() {
                 console.log('error');
             });
-    }
+    };
+
+    $scope.connect = function() {
+        $scope.connected = true;
+    };
+
+    $scope.disconnect = function() {
+        $scope.connected = false;
+    };
 }]);
