@@ -1,7 +1,10 @@
 'use strict';
 
 angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUrl', function($scope, $http, defaultServerUrl) {
-    $scope.serverUrl = defaultServerUrl;
+    $scope.connection = {
+        serverUrl: defaultServerUrl,
+        type: 'REST'
+    };
     $scope.connected = false;
 
     $scope.message = {
@@ -20,7 +23,7 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUr
     }
 
     $scope.sendMessage = function() {
-        $http.post('http://' + $scope.serverUrl + '/api/client/send-text-message', $scope.message).
+        $http.post('http://' + $scope.connection.serverUrl + '/api/client/send-text-message', $scope.message).
             success(function(msg) {
                 $scope.message.text = '';
                 showMessage(msg);
@@ -32,7 +35,7 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUr
 
     $scope.receiveMessage = function() {
         if ($scope.connected) {
-            $http.get('http://' + $scope.serverUrl + '/api/client/receive-text-message').
+            $http.get('http://' + $scope.connection.serverUrl + '/api/client/receive-text-message').
                 success(function(messages) {
                     if (messages.length > 0) {
                         messages.forEach(showMessage);
