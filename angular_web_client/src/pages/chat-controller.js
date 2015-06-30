@@ -13,7 +13,7 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUr
     $scope.sendMessage = function() {
         $http.post('http://' + $scope.serverUrl + '/api/client/send-text-message', $scope.message).
             success(function() {
-                console.log('success');
+                $scope.message.text = '';
             })
             .error(function() {
                 console.log('error');
