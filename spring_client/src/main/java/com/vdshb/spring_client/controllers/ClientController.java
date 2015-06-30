@@ -24,9 +24,10 @@ public class ClientController {
     MessageVault messageVault;
 
     @RequestMapping(value = "/send-text-message", method = RequestMethod.POST)
-    public void sendTextMessage(@RequestBody TextMessage msg) {
+    public TextMessage sendTextMessage(@RequestBody TextMessage msg) {
         msg.setTime(LocalDateTime.now());
         restMessaging.sendTextMessage(msg);
+        return msg;
     }
 
     @RequestMapping(value = "/receive-text-message", method = RequestMethod.GET)
