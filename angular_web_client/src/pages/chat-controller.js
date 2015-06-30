@@ -13,7 +13,7 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUr
 
     function showMessage(msg) {
         var visualMessage = {
-            text: '[' + msg.time.substring(0, 15) + '] <' + msg.author + '> ' + msg.text,
+            text: '[' + msg.time.substring(0, 16) + '] <' + msg.author + '> ' + msg.text,
             color: msg.author == $scope.message.author ? 'red' : 'blue'
         };
         $scope.visibleMessageLine.push(visualMessage)
