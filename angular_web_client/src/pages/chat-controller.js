@@ -5,6 +5,7 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUr
     $scope.connected = false;
 
     $scope.message = {
+        author: '',
         text: ''
     };
 
@@ -26,7 +27,14 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUr
             $http.get('http://' + $scope.serverUrl + '/api/client/receive-text-message').
                 success(function(messages) {
                     if (messages.length > 0) {
-                        messages.forEach(function(msg) {$scope.visibleMessageLine.push(msg)});
+
+                        messages.forEach(function(msg) {
+                            var visualMessage = {
+                                text: '[' + msg.time.substring(0, 15) + '] <' + msg.author + '> ' + msg.text,
+                                color: msg.author == $scope.message.author ? 'red' : 'blue'
+                            };
+                            $scope.visibleMessageLine.push(visualMessage)
+                        });
                     }
                     setTimeout($scope.receiveMessage, 300);
                 })

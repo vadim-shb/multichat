@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +25,7 @@ public class ClientController {
 
     @RequestMapping(value = "/send-text-message", method = RequestMethod.POST)
     public void sendTextMessage(@RequestBody TextMessage msg) {
-        System.out.println("===============");
-        System.out.println(msg);
-        System.out.println("===============");
+        msg.setTime(LocalDateTime.now());
         restMessaging.sendTextMessage(msg);
     }
 
