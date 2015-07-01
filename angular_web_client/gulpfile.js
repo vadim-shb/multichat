@@ -8,6 +8,7 @@ var concat = require('gulp-concat');
 
 var config = {
     jsSource: [
+        'src/modules/**/*MODULE_DECLARATION.js',
         'src/modules/**/*.js',
         'src/app.js',
         'src/utils/**/*.js',

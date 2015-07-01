@@ -2,7 +2,8 @@
 
 angular
     .module('webClient', [
-        'ngRoute'
+        'ngRoute',
+        'communicators'
     ])
     .config(['$routeProvider', function($routeProvider) {
         $routeProvider.when('/', {templateUrl: 'pages/chat.html', controller: 'ChatCtrl'});

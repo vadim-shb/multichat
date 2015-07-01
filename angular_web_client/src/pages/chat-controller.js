@@ -1,10 +1,12 @@
 'use strict';
 
-angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUrl', function($scope, $http, defaultServerUrl) {
+angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUrl', 'restCommunicator', function($scope, $http, defaultServerUrl, restCommunicator) {
+    var communicator;
     $scope.connection = {
         serverUrl: defaultServerUrl,
         type: 'REST'
     };
+
     $scope.connected = false;
 
     $scope.message = {
@@ -22,40 +24,44 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUr
         $scope.visibleMessageLine.push(visualMessage)
     }
 
-    $scope.sendMessage = function() {
-        $http.post('http://' + $scope.connection.serverUrl + '/api/client/send-text-message', $scope.message).
-            success(function(msg) {
-                $scope.message.text = '';
-                showMessage(msg);
-            })
-            .error(function() {
-                console.log('error');
-            });
+    var sendMessageSuccess = function(sentMessageWithTime) {
+        $scope.message.text = '';
+        showMessage(sentMessageWithTime);
+    };
+    var sendMessageError = function() {
+        console.log("Error. Can't send message");
+    };
+    var receiveMessagesSuccess = function(messages) {
+        if (messages.length > 0) {
+            messages.forEach(showMessage);
+        }
+    };
+    var receiveMessagesError = function() {
+        console.log('error');
     };
 
-    $scope.receiveMessage = function() {
-        if ($scope.connected) {
-            $http.get('http://' + $scope.connection.serverUrl + '/api/client/receive-text-message').
-                success(function(messages) {
-                    if (messages.length > 0) {
-                        messages.forEach(showMessage);
-                    }
-                    setTimeout($scope.receiveMessage, 300);
-                })
-                .error(function() {
-                    console.log('error');
-                    setTimeout($scope.receiveMessage, 300);
-                });
+    $scope.sendMessage = function() {
+        communicator.sendMessage($scope.message, sendMessageSuccess, sendMessageError);
+    };
+
+    $scope.connect = function() {
+        if ($scope.connection.type == "REST") {
+            communicator = restCommunicator;
+            communicator.connect($scope.connection.serverUrl);
+            communicator.receiveMessages(receiveMessagesSuccess, receiveMessagesError);
+            $scope.connected = true;
+        }
+        if ($scope.connection.type == "WebSocket") {
+
+        }
+        if ($scope.connection.type == "SocksJS") {
+        }
+        if ($scope.connection.type == "SocksJS + STOMP") {
         }
     };
 
-
-    $scope.connect = function() {
-        $scope.connected = true;
-        $scope.receiveMessage();
-    };
-
     $scope.disconnect = function() {
+        communicator.disconnect();
         $scope.connected = false;
     };
 }]);
