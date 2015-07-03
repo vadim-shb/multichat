@@ -1,10 +1,11 @@
 angular.module("communicators").factory("restCommunicator", ['$http', function($http) {
         var scope = {};
-        var CHECK_MESSAGES_INTERVAL = 300;
+        var CHECK_MESSAGES_INTERVAL = 700;
 
-        var connectFunc = function(address) {
+        var connectFunc = function(address, receiveMessagesCallback, connectionErrorCallback) {
             scope.url = 'http://' + address + '/api/client';
             scope.connected = true;
+            receiveMessagesFunc(receiveMessagesCallback, connectionErrorCallback);
         };
         var disconnectFunc = function() {
             scope.connected = false;
@@ -31,8 +32,7 @@ angular.module("communicators").factory("restCommunicator", ['$http', function($
         return {
             connect: connectFunc,
             disconnect: disconnectFunc,
-            sendMessage: sendMessageFunc,
-            receiveMessages: receiveMessagesFunc
+            sendMessage: sendMessageFunc
         }
     }]
 );

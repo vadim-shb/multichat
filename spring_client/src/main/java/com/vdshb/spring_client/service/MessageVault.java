@@ -1,11 +1,12 @@
 package com.vdshb.spring_client.service;
 
 import com.vdshb.spring_client.domain.TextMessage;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Component
 public class MessageVault {
     private List<TextMessage> messagesToDeliver = new ArrayList<>();
 

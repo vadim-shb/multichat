@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUrl', 'restCommunicator', function($scope, $http, defaultServerUrl, restCommunicator) {
+angular.module('webClient').controller('ChatCtrl', ['$scope', 'serverUrl', 'restCommunicator', 'webSocketCommunicator', function($scope, defaultServerUrl, restCommunicator, webSocketCommunicator) {
     var communicator;
     $scope.connection = {
         serverUrl: defaultServerUrl,
@@ -37,7 +37,7 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUr
         }
     };
     var receiveMessagesError = function() {
-        console.log('error');
+        console.log("Error. Can't receive messages");
     };
 
     $scope.sendMessage = function() {
@@ -47,12 +47,15 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', '$http', 'serverUr
     $scope.connect = function() {
         if ($scope.connection.type == "REST") {
             communicator = restCommunicator;
-            communicator.connect($scope.connection.serverUrl);
-            communicator.receiveMessages(receiveMessagesSuccess, receiveMessagesError);
+            //communicator.receiveMessages(receiveMessagesSuccess, receiveMessagesError);
+            communicator.connect($scope.connection.serverUrl, receiveMessagesSuccess, receiveMessagesError);
             $scope.connected = true;
         }
         if ($scope.connection.type == "WebSocket") {
-
+            communicator = webSocketCommunicator;
+            communicator.receiveMessages(receiveMessagesSuccess, receiveMessagesError);
+            communicator.connect($scope.connection.serverUrl);
+            $scope.connected = true;
         }
         if ($scope.connection.type == "SocksJS") {
         }
