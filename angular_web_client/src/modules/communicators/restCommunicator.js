@@ -1,13 +1,15 @@
 angular.module("communicators").factory("restCommunicator", ['$http', function($http) {
         var url = "";
         var connected = false;
-        var CHECK_MESSAGES_INTERVAL = 3000;
+        var CHECK_MESSAGES_INTERVAL = 300;
         var innerCloseConnectionCallback;
+        var charSessionId;
 
         var connectFunc = function(address, receiveMessagesCallback, closeConnectionCallback) {
             url = 'http://' + address + '/api/client';
             $http.get(url + '/connect').
-                success(function() {
+                success(function(data) {
+                    charSessionId = data.charSessionId;
                     connected = true;
                     innerCloseConnectionCallback = closeConnectionCallback;
                     receiveMessagesFunc(receiveMessagesCallback);
@@ -17,13 +19,7 @@ angular.module("communicators").factory("restCommunicator", ['$http', function($
                 });
         };
         var disconnectFunc = function() {
-            $http.get(url + '/disconnect').
-                success(function() {
-                    // ignore ...
-                })
-                .error(function() {
-                    // ignore ...
-                });
+            $http.get(url + '/disconnect', {params: {chatSessionId: charSessionId}});
             innerCloseConnectionCallback();
             connected = false;
         };
@@ -34,12 +30,13 @@ angular.module("communicators").factory("restCommunicator", ['$http', function($
         };
         var receiveMessagesFunc = function(successCallback) {
             if (connected) {
-                $http.get(url + '/receive-text-messages').
+                $http.get(url + '/receive-text-messages', {params: {chatSessionId: charSessionId}}).
                     success(function(messages) {
                         successCallback(messages);
-                        setTimeout(receiveMessagesFunc(successCallback), CHECK_MESSAGES_INTERVAL);
+                        setTimeout(receiveMessagesFunc, CHECK_MESSAGES_INTERVAL, successCallback);
                     })
                     .error(function() {
+                        //setTimeout(receiveMessagesFunc, CHECK_MESSAGES_INTERVAL, successCallback);
                         innerCloseConnectionCallback();
                     });
             }

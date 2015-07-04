@@ -10,8 +10,6 @@ import com.vdshb.spring_client.service.SubscribersVault;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,7 +19,6 @@ public class ClientController {
 
     @Autowired
     RestMessaging restMessaging;
-
     @Autowired
     MessageVault messageVault;
     @Autowired
@@ -30,24 +27,20 @@ public class ClientController {
     SubscribersVault subscribersVault;
 
     @RequestMapping(value = "/connect", method = RequestMethod.GET)
-    public void connectToChat(HttpServletResponse response) {
+    public String connectToChat() {
         Subscriber newSubscriber = new Subscriber();
         newSubscriber.setConnectionType(ClientConnectionType.REST);
         newSubscriber.setLastMessageId(-1);
         newSubscriber.setRestSessionId(String.valueOf(sessionIdGenerator.generate()));
         subscribersVault.subscribe(newSubscriber);
 
-        response.addCookie(new Cookie("ChatSessionId", newSubscriber.getRestSessionId()));
+        String charSessionId = newSubscriber.getRestSessionId();
+        return "{\"charSessionId\": \"" + charSessionId + "\"}";
     }
 
     @RequestMapping(value = "/disconnect", method = RequestMethod.GET)
-    public void connectToChat(@CookieValue("ChatSessionId") String sessionId, HttpServletResponse response) {
+    public void connectToChat(@RequestParam("chatSessionId") String sessionId) {
         subscribersVault.unSubscribe(sessionId);
-
-        Cookie chatSessionCookie = new Cookie("ChatSessionId", null);
-        chatSessionCookie.setHttpOnly(true);
-        chatSessionCookie.setMaxAge(1000 * 60 * 60 * 24);
-        response.addCookie(chatSessionCookie);
     }
 
     @RequestMapping(value = "/send-text-message", method = RequestMethod.POST)
@@ -58,7 +51,7 @@ public class ClientController {
     }
 
     @RequestMapping(value = "/receive-text-messages", method = RequestMethod.GET)
-    public List<ChatTextMessage> receiveTextMessage(@CookieValue("ChatSessionId") String sessionId) {
+    public List<ChatTextMessage> receiveTextMessage(@RequestParam("chatSessionId") String sessionId) {
         Subscriber subscriber = subscribersVault.getSubscriber(sessionId);
         MessageVault.MessagesToDeliver messagesToDeliver = messageVault.getMessagesToDeliver(subscriber.getLastMessageId());
         subscriber.setLastMessageId(messagesToDeliver.lastId);

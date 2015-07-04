@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 @Component
 public class WsHandler extends TextWebSocketHandler {
 
-
     @Autowired
     private WsMessageJsonSerializer jsonSerializer;
     @Autowired

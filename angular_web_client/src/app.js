@@ -5,9 +5,9 @@ angular
         'ngRoute',
         'communicators'
     ])
-    .config(['$httpProvider', function($httpProvider) {
-        $httpProvider.defaults.withCredentials = true;
-    }])
+    //.config(['$httpProvider', function($httpProvider) {
+    //    $httpProvider.defaults.withCredentials = true;
+    //}])
     .config(['$routeProvider', function($routeProvider) {
         $routeProvider.when('/', {templateUrl: 'pages/chat.html', controller: 'ChatCtrl'});
         $routeProvider.otherwise({redirectTo: '/'});

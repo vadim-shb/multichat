@@ -4,7 +4,7 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', 'serverUrl', 'rest
     var communicator;
     $scope.connection = {
         serverUrl: defaultServerUrl,
-        type: 'WebSocket'
+        type: 'REST'
     };
 
     $scope.connected = false;
@@ -37,8 +37,10 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', 'serverUrl', 'rest
     var onReceiveMessages = function(messages) {
         if (messages.length > 0) {
             messages.forEach($scope.showMessage);
+            if (!$scope.$$phase) {
+                $scope.$apply();
+            }
         }
-        $scope.$apply();
     };
     var onReceiveMessagesError = function() {
         console.log("Error. Can't receive messages");
@@ -47,7 +49,9 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', 'serverUrl', 'rest
     var onDisconnect = function() {
         $scope.visibleMessageLine = [];
         $scope.connected = false;
-        $scope.$apply();
+        if (!$scope.$$phase) {
+            $scope.$apply();
+        }
     };
 
     $scope.sendMessage = function() {

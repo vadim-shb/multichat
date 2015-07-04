@@ -22,9 +22,6 @@ public class RestMessagingController {
 
     @RequestMapping(value = "/message", method = RequestMethod.POST)
     public void sendTextMessage(@RequestBody ChatTextMessage msg) throws IOException {
-        System.out.println("======= received ========");
-        System.out.println(msg);
-        System.out.println("=========================");
         messageVault.addMessage(msg);
         pushMessagesSender.pushWebSocketMessagesToAllSubscribers();
     }
