@@ -70,6 +70,9 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', 'serverUrl', 'rest
             $scope.connected = true;
         }
         if ($scope.connection.type == "SocksJS") {
+            communicator = webSocketCommunicator;
+            communicator.connect($scope.connection.serverUrl, onReceiveMessages, onDisconnect);
+            $scope.connected = true;
         }
         if ($scope.connection.type == "SocksJS + STOMP") {
         }
