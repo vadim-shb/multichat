@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 @Getter
 @Setter
 @ToString
-public class TextMessage {
+public class ChatTextMessage {
     private String author;
     private LocalDateTime time;
     private String text;

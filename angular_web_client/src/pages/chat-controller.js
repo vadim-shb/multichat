@@ -4,7 +4,7 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', 'serverUrl', 'rest
     var communicator;
     $scope.connection = {
         serverUrl: defaultServerUrl,
-        type: 'REST'
+        type: 'WebSocket'
     };
 
     $scope.connected = false;
@@ -16,45 +16,53 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', 'serverUrl', 'rest
 
     $scope.visibleMessageLine = [];
 
-    function showMessage(msg) {
+    $scope.showMessage = function(msg) {
         var visualMessage = {
             text: '[' + msg.time.substring(0, 16) + '] <' + msg.author + '> ' + msg.text,
             color: msg.author == $scope.message.author ? 'red' : 'blue'
         };
         $scope.visibleMessageLine.push(visualMessage)
-    }
-
-    var sendMessageSuccess = function(sentMessageWithTime) {
-        $scope.message.text = '';
-        showMessage(sentMessageWithTime);
     };
-    var sendMessageError = function() {
+
+    $scope.clearMessagesArea = function() {
+        $scope.message.text = '';
+    };
+
+    var onSendMessageSuccess = function() {
+        $scope.clearMessagesArea();
+    };
+    var onSendMessageError = function() {
         console.log("Error. Can't send message");
     };
-    var receiveMessagesSuccess = function(messages) {
+    var onReceiveMessages = function(messages) {
         if (messages.length > 0) {
-            messages.forEach(showMessage);
+            messages.forEach($scope.showMessage);
         }
+        $scope.$apply();
     };
-    var receiveMessagesError = function() {
+    var onReceiveMessagesError = function() {
         console.log("Error. Can't receive messages");
     };
 
+    var onDisconnect = function() {
+        $scope.visibleMessageLine = [];
+        $scope.connected = false;
+        $scope.$apply();
+    };
+
     $scope.sendMessage = function() {
-        communicator.sendMessage($scope.message, sendMessageSuccess, sendMessageError);
+        communicator.sendMessage($scope.message, onSendMessageSuccess, onSendMessageError);
     };
 
     $scope.connect = function() {
         if ($scope.connection.type == "REST") {
             communicator = restCommunicator;
-            //communicator.receiveMessages(receiveMessagesSuccess, receiveMessagesError);
-            communicator.connect($scope.connection.serverUrl, receiveMessagesSuccess, receiveMessagesError);
+            communicator.connect($scope.connection.serverUrl, onReceiveMessages, onDisconnect);
             $scope.connected = true;
         }
         if ($scope.connection.type == "WebSocket") {
             communicator = webSocketCommunicator;
-            communicator.receiveMessages(receiveMessagesSuccess, receiveMessagesError);
-            communicator.connect($scope.connection.serverUrl);
+            communicator.connect($scope.connection.serverUrl, onReceiveMessages, onDisconnect);
             $scope.connected = true;
         }
         if ($scope.connection.type == "SocksJS") {

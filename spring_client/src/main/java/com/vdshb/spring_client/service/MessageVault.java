@@ -1,29 +1,44 @@
 package com.vdshb.spring_client.service;
 
-import com.vdshb.spring_client.domain.TextMessage;
+import com.vdshb.spring_client.domain.ChatTextMessage;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class MessageVault {
-    private List<TextMessage> messagesToDeliver = new ArrayList<>();
+    private Map<Long, ChatTextMessage> messagesToDeliver = new HashMap<>();
 
-    public void clean() {
-        messagesToDeliver.clear();
+    private AtomicLong lastId = new AtomicLong(-1L);
+
+    public void addMessage(ChatTextMessage message) {
+        if (message != null) messagesToDeliver.put(lastId.incrementAndGet(), message);
     }
 
-    public void addMessage(TextMessage message) {
-        if (message != null) messagesToDeliver.add(message);
+    public MessagesToDeliver getMessagesToDeliver(long from) {
+        long to = lastId.get();
+        int quantity = to - from > 10000 ? 10000 : (int) (to - from);
+        if (quantity < 0) quantity = 0;
+        to = from + quantity;
+
+        List<ChatTextMessage> messages = new ArrayList<>(quantity);
+        for (long i = from + 1; i <= to; i++) {
+            messages.add(messagesToDeliver.get(i));
+        }
+        return new MessagesToDeliver(messages, to);
     }
 
-    public void addMessages(List<TextMessage> messages) {
-        if (messages != null)
-            messages.forEach(message -> addMessage(message));
-    }
+    public static class MessagesToDeliver {
+        public List<ChatTextMessage> messages;
+        public long lastId;
 
-    public List<TextMessage> getMessagesToDeliver() {
-        return messagesToDeliver;
+        public MessagesToDeliver(List<ChatTextMessage> messages, long lastId) {
+            this.messages = messages;
+            this.lastId = lastId;
+        }
     }
 }

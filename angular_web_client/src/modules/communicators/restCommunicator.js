@@ -1,30 +1,46 @@
 angular.module("communicators").factory("restCommunicator", ['$http', function($http) {
-        var scope = {};
-        var CHECK_MESSAGES_INTERVAL = 700;
+        var url = "";
+        var connected = false;
+        var CHECK_MESSAGES_INTERVAL = 3000;
+        var innerCloseConnectionCallback;
 
-        var connectFunc = function(address, receiveMessagesCallback, connectionErrorCallback) {
-            scope.url = 'http://' + address + '/api/client';
-            scope.connected = true;
-            receiveMessagesFunc(receiveMessagesCallback, connectionErrorCallback);
+        var connectFunc = function(address, receiveMessagesCallback, closeConnectionCallback) {
+            url = 'http://' + address + '/api/client';
+            $http.get(url + '/connect').
+                success(function() {
+                    connected = true;
+                    innerCloseConnectionCallback = closeConnectionCallback;
+                    receiveMessagesFunc(receiveMessagesCallback);
+                })
+                .error(function() {
+                    closeConnectionCallback();
+                });
         };
         var disconnectFunc = function() {
-            scope.connected = false;
+            $http.get(url + '/disconnect').
+                success(function() {
+                    // ignore ...
+                })
+                .error(function() {
+                    // ignore ...
+                });
+            innerCloseConnectionCallback();
+            connected = false;
         };
         var sendMessageFunc = function(message, successCallback, errorCallback) {
-            $http.post(scope.url + '/send-text-message', message).
+            $http.post(url + '/send-text-message', message).
                 success(successCallback)
                 .error(errorCallback);
         };
-        var receiveMessagesFunc = function(successCallback, errorCallback) {
-            if (scope.connected) {
-                $http.get(scope.url + '/receive-text-message').
+        var receiveMessagesFunc = function(successCallback) {
+            if (connected) {
+                $http.get(url + '/receive-text-messages').
                     success(function(messages) {
                         successCallback(messages);
-                        setTimeout(receiveMessagesFunc(successCallback, errorCallback), CHECK_MESSAGES_INTERVAL);
+                        setTimeout(receiveMessagesFunc(successCallback), CHECK_MESSAGES_INTERVAL);
                     })
                     .error(function() {
-                        errorCallback();
-                        setTimeout(receiveMessagesFunc(successCallback, errorCallback), CHECK_MESSAGES_INTERVAL);
+                        innerCloseConnectionCallback();
                     });
             }
         };

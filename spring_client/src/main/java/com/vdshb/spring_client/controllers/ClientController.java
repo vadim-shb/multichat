@@ -1,16 +1,18 @@
 package com.vdshb.spring_client.controllers;
 
-import com.vdshb.spring_client.domain.TextMessage;
+import com.vdshb.spring_client.domain.ChatTextMessage;
+import com.vdshb.spring_client.domain.Subscriber;
+import com.vdshb.spring_client.domain.enums.ClientConnectionType;
 import com.vdshb.spring_client.service.MessageVault;
 import com.vdshb.spring_client.service.RestMessaging;
+import com.vdshb.spring_client.service.SessionIdGenerator;
+import com.vdshb.spring_client.service.SubscribersVault;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,22 +24,45 @@ public class ClientController {
 
     @Autowired
     MessageVault messageVault;
+    @Autowired
+    SessionIdGenerator sessionIdGenerator;
+    @Autowired
+    SubscribersVault subscribersVault;
 
-    @RequestMapping(value = "/send-text-message", method = RequestMethod.POST)
-    public TextMessage sendTextMessage(@RequestBody TextMessage msg) {
-        msg.setTime(LocalDateTime.now());
-        restMessaging.sendTextMessage(msg);
-        return msg;
+    @RequestMapping(value = "/connect", method = RequestMethod.GET)
+    public void connectToChat(HttpServletResponse response) {
+        Subscriber newSubscriber = new Subscriber();
+        newSubscriber.setConnectionType(ClientConnectionType.REST);
+        newSubscriber.setLastMessageId(-1);
+        newSubscriber.setRestSessionId(String.valueOf(sessionIdGenerator.generate()));
+        subscribersVault.subscribe(newSubscriber);
+
+        response.addCookie(new Cookie("ChatSessionId", newSubscriber.getRestSessionId()));
     }
 
-    @RequestMapping(value = "/receive-text-message", method = RequestMethod.GET)
-    public List<TextMessage> receiveTextMessage() {
-        List<TextMessage> retval = new ArrayList<>();
-        if (messageVault.getMessagesToDeliver().size() > 0) {
-            retval.addAll(messageVault.getMessagesToDeliver());
-            messageVault.clean();
-        }
-        return retval;
+    @RequestMapping(value = "/disconnect", method = RequestMethod.GET)
+    public void connectToChat(@CookieValue("ChatSessionId") String sessionId, HttpServletResponse response) {
+        subscribersVault.unSubscribe(sessionId);
+
+        Cookie chatSessionCookie = new Cookie("ChatSessionId", null);
+        chatSessionCookie.setHttpOnly(true);
+        chatSessionCookie.setMaxAge(1000 * 60 * 60 * 24);
+        response.addCookie(chatSessionCookie);
+    }
+
+    @RequestMapping(value = "/send-text-message", method = RequestMethod.POST)
+    public void sendTextMessage(@RequestBody ChatTextMessage msg) {
+        msg.setTime(LocalDateTime.now());
+        restMessaging.sendTextMessage(msg);
+        messageVault.addMessage(msg);
+    }
+
+    @RequestMapping(value = "/receive-text-messages", method = RequestMethod.GET)
+    public List<ChatTextMessage> receiveTextMessage(@CookieValue("ChatSessionId") String sessionId) {
+        Subscriber subscriber = subscribersVault.getSubscriber(sessionId);
+        MessageVault.MessagesToDeliver messagesToDeliver = messageVault.getMessagesToDeliver(subscriber.getLastMessageId());
+        subscriber.setLastMessageId(messagesToDeliver.lastId);
+        return messagesToDeliver.messages;
     }
 
 }
