@@ -24,27 +24,27 @@ public class RestClient {
     }
 
     public String get(String uri) {
-        HttpEntity<String> requestEntity = new HttpEntity<String>("", headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
         ResponseEntity<String> responseEntity = rest.exchange(server + uri, HttpMethod.GET, requestEntity, String.class);
         this.setStatus(responseEntity.getStatusCode());
         return responseEntity.getBody();
     }
 
     public String post(String uri, String json) {
-        HttpEntity<String> requestEntity = new HttpEntity<String>(json, headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(json, headers);
         ResponseEntity<String> responseEntity = rest.exchange(server + uri, HttpMethod.POST, requestEntity, String.class);
         this.setStatus(responseEntity.getStatusCode());
         return responseEntity.getBody();
     }
 
     public void put(String uri, String json) {
-        HttpEntity<String> requestEntity = new HttpEntity<String>(json, headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(json, headers);
         ResponseEntity<String> responseEntity = rest.exchange(server + uri, HttpMethod.PUT, requestEntity, String.class);
         this.setStatus(responseEntity.getStatusCode());
     }
 
     public void delete(String uri) {
-        HttpEntity<String> requestEntity = new HttpEntity<String>("", headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
         ResponseEntity<String> responseEntity = rest.exchange(server + uri, HttpMethod.DELETE, requestEntity, String.class);
         this.setStatus(responseEntity.getStatusCode());
     }
