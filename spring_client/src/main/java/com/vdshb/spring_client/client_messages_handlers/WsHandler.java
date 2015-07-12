@@ -1,4 +1,4 @@
-package com.vdshb.spring_client.controllers;
+package com.vdshb.spring_client.client_messages_handlers;
 
 import com.vdshb.spring_client.domain.ChatTextMessage;
 import com.vdshb.spring_client.domain.Subscriber;

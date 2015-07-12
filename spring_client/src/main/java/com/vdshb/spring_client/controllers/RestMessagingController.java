@@ -1,5 +1,6 @@
 package com.vdshb.spring_client.controllers;
 
+import com.vdshb.spring_client.client_messages_handlers.PushMessagesSender;
 import com.vdshb.spring_client.domain.ChatTextMessage;
 import com.vdshb.spring_client.service.MessageVault;
 import org.springframework.beans.factory.annotation.Autowired;
