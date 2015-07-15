@@ -1,15 +1,8 @@
-angular.module("communicators").factory("sockJsCommunicator", [function() {
+angular.module('communicators').factory('sockJsCommunicator', ['tokenGenerator', function(tokenGenerator) {
         var TIMEOUT = 3000;
         var ws;
 
         var waitForReceive = {};
-
-        function generateToken(length) {
-            var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            var result = '';
-            for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
-            return result;
-        }
 
         var connectFunc = function(address, receiveMessagesCallback, closeConnectionCallback) {
             ws = new SockJS('http://' + address + '/sockJsHandler');
@@ -34,7 +27,7 @@ angular.module("communicators").factory("sockJsCommunicator", [function() {
             ws.close();
         };
         var sendMessageFunc = function(message, successCallback, errorCallback) {
-            var receiveToken = generateToken(15);
+            var receiveToken = tokenGenerator.generate(32);
             ws.send(JSON.stringify({
                 command: 'SEND_TEXT_MESSAGE',
                 messageId: receiveToken,

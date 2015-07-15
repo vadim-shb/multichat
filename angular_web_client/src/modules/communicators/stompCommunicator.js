@@ -1,4 +1,4 @@
-angular.module("communicators").factory("stompCommunicator", ['tokenGenerator', function(tokenGenerator) {
+angular.module('communicators').factory('stompCommunicator', ['tokenGenerator', function(tokenGenerator) {
         var stompClient;
         var disconnectCallback;
 

@@ -1,4 +1,4 @@
-angular.module("communicators").factory("restCommunicator", ['$http', function($http) {
+angular.module('communicators').factory('restCommunicator', ['$http', function($http) {
         var url = "";
         var connected = false;
         var CHECK_MESSAGES_INTERVAL = 300;
