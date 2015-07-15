@@ -56,10 +56,6 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', 'serverUrl', 'rest
             }
         };
 
-        var onReceiveMessagesError = function() {
-            console.log("Error. Can't receive messages");
-        };
-
         var onDisconnect = function() {
             $scope.visibleMessageLine = [];
             $scope.connected = false;

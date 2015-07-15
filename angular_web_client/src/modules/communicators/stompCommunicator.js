@@ -1,5 +1,6 @@
 angular.module("communicators").factory("stompCommunicator", ['tokenGenerator', function(tokenGenerator) {
         var stompClient;
+        var disconnectCallback;
 
         var connectFunc = function(address, receiveMessagesCallback, closeConnectionCallback) {
             var ws = new SockJS('http://' + address + '/stomp');
@@ -12,9 +13,11 @@ angular.module("communicators").factory("stompCommunicator", ['tokenGenerator', 
                 });
             });
             ws.onclose = closeConnectionCallback;
+            disconnectCallback = closeConnectionCallback;
         };
         var disconnectFunc = function() {
             stompClient.disconnect();
+            disconnectCallback();
         };
         var sendMessageFunc = function(message, successCallback, errorCallback) {
             var token = tokenGenerator.generate(32);

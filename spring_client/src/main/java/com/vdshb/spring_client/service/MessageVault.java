@@ -41,4 +41,8 @@ public class MessageVault {
             this.lastId = lastId;
         }
     }
+
+    public long getLastMessageId() {
+        return lastId.get();
+    }
 }
