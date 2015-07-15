@@ -1,5 +1,6 @@
 package com.vdshb.spring_client.client_messages_handlers;
 
+import com.vdshb.spring_client.domain.ChatTextMessage;
 import com.vdshb.spring_client.domain.Subscriber;
 import com.vdshb.spring_client.domain.WsMessagePack;
 import com.vdshb.spring_client.service.MessageVault;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 public class PushMessagesSender {
@@ -32,6 +34,15 @@ public class PushMessagesSender {
     public void pushWebSocketMessagesToAllSubscribers() throws IOException {
         for (Subscriber subscriber : subscribersVault.getWebSocketSubscribers()) {
             pushWebSocketMessages(subscriber);
+        }
+    }
+
+    public void pushMessageToAllWebSocketSubscribers(ChatTextMessage message) throws IOException {
+        for (Subscriber subscriber : subscribersVault.getWebSocketSubscribers()) {
+            WsMessagePack wsMessagePack = new WsMessagePack();
+            wsMessagePack.setCommand("SEND_TEXT_MESSAGEs");
+            wsMessagePack.setMessages(Collections.singletonList(message));
+            subscriber.getWsSession().sendMessage(new TextMessage(jsonSerializer.toJson(wsMessagePack)));
         }
     }
 }

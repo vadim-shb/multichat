@@ -4,8 +4,8 @@ import com.vdshb.spring_client.domain.ChatTextMessage;
 import com.vdshb.spring_client.domain.Subscriber;
 import com.vdshb.spring_client.domain.WsMessage;
 import com.vdshb.spring_client.domain.enums.ClientConnectionType;
+import com.vdshb.spring_client.service.InterServerMessaging;
 import com.vdshb.spring_client.service.MessageVault;
-import com.vdshb.spring_client.service.RestMessaging;
 import com.vdshb.spring_client.service.SubscribersVault;
 import com.vdshb.spring_client.service.WsMessageJsonSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class SockJsHandler extends TextWebSocketHandler {
     @Autowired
     private WsMessageJsonSerializer jsonSerializer;
     @Autowired
-    private RestMessaging restMessaging;
+    private InterServerMessaging interServerMessaging;
     @Autowired
     private MessageVault messageVault;
     @Autowired
@@ -48,7 +48,7 @@ public class SockJsHandler extends TextWebSocketHandler {
         if ("SEND_TEXT_MESSAGE".equals(wsMessage.getCommand())) {
             ChatTextMessage chatTextMessage = wsMessage.getMessage();
             chatTextMessage.setTime(LocalDateTime.now());
-            restMessaging.sendTextMessage(chatTextMessage);
+            interServerMessaging.sendTextMessage(chatTextMessage);
             messageVault.addMessage(chatTextMessage);
 
             WsMessage answer = new WsMessage();
@@ -58,7 +58,6 @@ public class SockJsHandler extends TextWebSocketHandler {
             session.sendMessage(new TextMessage(jsonSerializer.toJson(answer)));
             pushMessagesSender.pushWebSocketMessagesToAllSubscribers();
         }
-
     }
 
     @Override

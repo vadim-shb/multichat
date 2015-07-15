@@ -3,8 +3,8 @@ package com.vdshb.spring_client.controllers;
 import com.vdshb.spring_client.domain.ChatTextMessage;
 import com.vdshb.spring_client.domain.Subscriber;
 import com.vdshb.spring_client.domain.enums.ClientConnectionType;
+import com.vdshb.spring_client.service.InterServerMessaging;
 import com.vdshb.spring_client.service.MessageVault;
-import com.vdshb.spring_client.service.RestMessaging;
 import com.vdshb.spring_client.service.SessionIdGenerator;
 import com.vdshb.spring_client.service.SubscribersVault;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.List;
 public class ClientController {
 
     @Autowired
-    RestMessaging restMessaging;
+    InterServerMessaging interServerMessaging;
     @Autowired
     MessageVault messageVault;
     @Autowired
@@ -46,7 +46,7 @@ public class ClientController {
     @RequestMapping(value = "/send-text-message", method = RequestMethod.POST)
     public void sendTextMessage(@RequestBody ChatTextMessage msg) {
         msg.setTime(LocalDateTime.now());
-        restMessaging.sendTextMessage(msg);
+        interServerMessaging.sendTextMessage(msg);
         messageVault.addMessage(msg);
     }
 

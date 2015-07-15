@@ -27,6 +27,9 @@ angular.module('webClient').controller('ChatCtrl', ['$scope', 'serverUrl', 'rest
 
         $scope.clearMessagesArea = function() {
             $scope.message.text = '';
+            if (!$scope.$$phase) {
+                $scope.$apply();
+            }
         };
 
         var onSendMessageSuccess = function() {

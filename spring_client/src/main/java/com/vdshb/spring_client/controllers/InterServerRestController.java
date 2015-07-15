@@ -1,8 +1,7 @@
 package com.vdshb.spring_client.controllers;
 
-import com.vdshb.spring_client.client_messages_handlers.PushMessagesSender;
 import com.vdshb.spring_client.domain.ChatTextMessage;
-import com.vdshb.spring_client.service.MessageVault;
+import com.vdshb.spring_client.service.ClientMessaging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,18 +12,14 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/messaging/rest")
-public class RestMessagingController {
+public class InterServerRestController {
 
     @Autowired
-    MessageVault messageVault;
-
-    @Autowired
-    PushMessagesSender pushMessagesSender;
+    private ClientMessaging clientMessaging;
 
     @RequestMapping(value = "/message", method = RequestMethod.POST)
     public void sendTextMessage(@RequestBody ChatTextMessage msg) throws IOException {
-        messageVault.addMessage(msg);
-        pushMessagesSender.pushWebSocketMessagesToAllSubscribers();
+        clientMessaging.sendToAllClients(msg);
     }
 
 }
