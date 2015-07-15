@@ -3,6 +3,7 @@
 angular
     .module('webClient', [
         'ngRoute',
+        'utils',
         'communicators'
     ])
     //.config(['$httpProvider', function($httpProvider) {

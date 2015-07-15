@@ -4,8 +4,8 @@ import com.vdshb.spring_client.domain.ChatTextMessage;
 import com.vdshb.spring_client.domain.Subscriber;
 import com.vdshb.spring_client.domain.WsMessage;
 import com.vdshb.spring_client.domain.enums.ClientConnectionType;
-import com.vdshb.spring_client.service.MessageVault;
-import com.vdshb.spring_client.service.RestMessaging;
+import com.vdshb.spring_client.service.ClientMessaging;
+import com.vdshb.spring_client.service.InterServerMessaging;
 import com.vdshb.spring_client.service.SubscribersVault;
 import com.vdshb.spring_client.service.WsMessageJsonSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,22 +23,18 @@ public class SockJsHandler extends TextWebSocketHandler {
     @Autowired
     private WsMessageJsonSerializer jsonSerializer;
     @Autowired
-    private RestMessaging restMessaging;
-    @Autowired
-    private MessageVault messageVault;
+    private InterServerMessaging interServerMessaging;
     @Autowired
     private SubscribersVault subscribersVault;
     @Autowired
-    private PushMessagesSender pushMessagesSender;
+    private ClientMessaging clientMessaging;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         Subscriber newSubscriber = new Subscriber();
         newSubscriber.setConnectionType(ClientConnectionType.WEB_SOCKET);
-        newSubscriber.setLastMessageId(-1);
         newSubscriber.setWsSession(session);
         subscribersVault.subscribe(newSubscriber);
-        pushMessagesSender.pushWebSocketMessages(newSubscriber);
     }
 
     @Override
@@ -48,17 +44,15 @@ public class SockJsHandler extends TextWebSocketHandler {
         if ("SEND_TEXT_MESSAGE".equals(wsMessage.getCommand())) {
             ChatTextMessage chatTextMessage = wsMessage.getMessage();
             chatTextMessage.setTime(LocalDateTime.now());
-            restMessaging.sendTextMessage(chatTextMessage);
-            messageVault.addMessage(chatTextMessage);
+            interServerMessaging.sendTextMessage(chatTextMessage);
+            clientMessaging.sendToAllClients(chatTextMessage);
 
             WsMessage answer = new WsMessage();
             answer.setCommand("SEND_TEXT_MESSAGE_RECEIVE");
             answer.setMessageId(wsMessage.getMessageId());
             answer.setCode(200);
             session.sendMessage(new TextMessage(jsonSerializer.toJson(answer)));
-            pushMessagesSender.pushWebSocketMessagesToAllSubscribers();
         }
-
     }
 
     @Override
