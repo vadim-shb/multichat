@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Controller
+@MessageMapping("/app")
 public class ClientStompController {
 
     @Autowired
