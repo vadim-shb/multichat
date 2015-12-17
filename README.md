@@ -1,18 +1,17 @@
 # multichat
 Spike for acquaintance with some java technologies.
 
-Chat which can use SOAP, JMX, RabbitMQ, REST for messages delivery.
+Chat which can use REST, WebSoskets(Vanilla, Socks, STOMP) for messages delivery.
 
 ---
 
 Two types of messages: 
 - text
-- picture
+- picture (not now)
 
 ---
 
-Clients on:
-- JavaEE (Wildfly) + JSF 
+Client on:
 - Spring + AngularJS + Bootstrap
  
 ---
